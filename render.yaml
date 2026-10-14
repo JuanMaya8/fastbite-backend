@@ -9,6 +9,8 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
+      - key: NODE_ENV
+        value: production
       # Set this in the Render dashboard to your Vercel URL
       # (no trailing slash), e.g. https://fastbite.vercel.app
       - key: CORS_ORIGIN

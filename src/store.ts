@@ -186,12 +186,12 @@ export class DeliveryStore {
 
   private async simulate(order: OrderData): Promise<void> {
     await this.wait(PREPARING_AFTER_S);
-    if (order.status === OrderStatus.CANCELLED) return;
+    if (isCancelled(order)) return;
     order.status = OrderStatus.PREPARING;
     this.publish(order, "The kitchen is preparing your food.", 0, KITCHEN_TIME_S + TRIP_TICKS);
 
     await this.wait(KITCHEN_TIME_S);
-    if (order.status === OrderStatus.CANCELLED) return;
+    if (isCancelled(order)) return;
     order.status = OrderStatus.ON_THE_WAY;
     this.publish(order, "Your courier picked up the order and is on the way.", 0, TRIP_TICKS);
 
@@ -204,4 +204,10 @@ export class DeliveryStore {
     order.status = OrderStatus.DELIVERED;
     this.publish(order, "Delivered. Enjoy your meal!", 1, 0);
   }
+}
+
+// A function call (instead of an inline comparison) stops TypeScript from
+// narrowing `order.status`: it can change to CANCELLED while we are awaiting.
+function isCancelled(order: OrderData): boolean {
+  return order.status === OrderStatus.CANCELLED;
 }
