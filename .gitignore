@@ -1,0 +1,5 @@
+node_modules
+dist
+# Generated from ./proto on every `npm run dev` / `npm run build`
+src/gen
+.env

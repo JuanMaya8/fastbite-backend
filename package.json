@@ -1,0 +1,29 @@
+{
+  "name": "fastbite-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "FastBite gRPC backend (Connect for Node.js: speaks gRPC, gRPC-Web and Connect)",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "generate": "buf generate proto --template buf.gen.yaml",
+    "dev": "npm run generate && tsx watch src/server.ts",
+    "build": "npm run generate && tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "demo": "tsx scripts/grpc-client.ts"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.2.0",
+    "@connectrpc/connect": "^2.0.0",
+    "@connectrpc/connect-node": "^2.0.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.50.0",
+    "@bufbuild/protoc-gen-es": "^2.2.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

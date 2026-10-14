@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package fastbite.v1;
+
+// FastBite: a food delivery service with live order tracking.
+//
+// This contract is the single source of truth for both the backend and the
+// frontend. TypeScript code for each side is generated from this file.
+service DeliveryService {
+  // Unary: returns the restaurant menu.
+  rpc ListMenu(ListMenuRequest) returns (ListMenuResponse);
+
+  // Unary: creates a new order and starts the delivery simulation.
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+
+  // Unary: returns the current snapshot of an order.
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+
+  // Unary: cancels an order (only allowed before the courier leaves).
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+
+  // Server streaming: the server pushes an update every time the order
+  // changes (status change, courier moving, ETA recalculated) until the
+  // order is delivered or cancelled.
+  rpc TrackOrder(TrackOrderRequest) returns (stream OrderUpdate);
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  ORDER_STATUS_PLACED = 1;
+  ORDER_STATUS_PREPARING = 2;
+  ORDER_STATUS_ON_THE_WAY = 3;
+  ORDER_STATUS_DELIVERED = 4;
+  ORDER_STATUS_CANCELLED = 5;
+}
+
+message MenuItem {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  // Price in Colombian pesos (COP). Integers avoid floating point money bugs.
+  int32 price_cop = 4;
+  string emoji = 5;
+}
+
+message OrderLine {
+  string menu_item_id = 1;
+  int32 quantity = 2;
+}
+
+message Order {
+  string id = 1;
+  string customer_name = 2;
+  string delivery_address = 3;
+  repeated OrderLine lines = 4;
+  int32 total_cop = 5;
+  OrderStatus status = 6;
+  // Unix timestamp in milliseconds.
+  int64 created_at_ms = 7;
+}
+
+message ListMenuRequest {}
+
+message ListMenuResponse {
+  repeated MenuItem items = 1;
+}
+
+message CreateOrderRequest {
+  string customer_name = 1;
+  string delivery_address = 2;
+  repeated OrderLine lines = 3;
+}
+
+message CreateOrderResponse {
+  Order order = 1;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderResponse {
+  Order order = 1;
+}
+
+message CancelOrderRequest {
+  string order_id = 1;
+}
+
+message CancelOrderResponse {
+  Order order = 1;
+}
+
+message TrackOrderRequest {
+  string order_id = 1;
+}
+
+message OrderUpdate {
+  string order_id = 1;
+  OrderStatus status = 2;
+  // Human readable text describing what is happening right now.
+  string message = 3;
+  // 0.0 (at the restaurant) to 1.0 (at the customer's door).
+  double route_progress = 4;
+  // Estimated seconds until delivery.
+  int32 eta_seconds = 5;
+  // Unix timestamp in milliseconds.
+  int64 timestamp_ms = 6;
+}

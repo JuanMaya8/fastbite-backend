@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: fastbite-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Set this in the Render dashboard to your Vercel URL
+      # (no trailing slash), e.g. https://fastbite.vercel.app
+      - key: CORS_ORIGIN
+        sync: false
